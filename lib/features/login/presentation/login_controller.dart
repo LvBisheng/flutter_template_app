@@ -19,7 +19,7 @@ class LoginController extends Notifier<LoginState> {
   void usernameChanged(String value) => state = state.copyWith(username: value);
   void passwordChanged(String value) => state = state.copyWith(password: value);
 
-  Future<void> login() async {
+  Future<void> login({required String emptyCredentialsMessage}) async {
     state = state.copyWith(loading: true);
     try {
       appLogger.i('Login started: ${state.username}');
@@ -27,7 +27,11 @@ class LoginController extends Notifier<LoginState> {
         LoginRepositoryImpl(LoginApi(ref.read(apiClientProvider))),
         ref.read(sessionManagerProvider.notifier),
       );
-      await useCase(state.username, state.password);
+      await useCase(
+        state.username,
+        state.password,
+        emptyCredentialsMessage: emptyCredentialsMessage,
+      );
       appLogger.i('Login succeeded: ${state.username}');
     } catch (e, st) {
       appLogger.e('Login failed', error: e, stackTrace: st);

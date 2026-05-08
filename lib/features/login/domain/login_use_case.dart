@@ -11,9 +11,13 @@ class LoginUseCase {
   final LoginRepository _repository;
   final SessionManager _sessionManager;
 
-  Future<void> call(String username, String password) async {
+  Future<void> call(
+    String username,
+    String password, {
+    required String emptyCredentialsMessage,
+  }) async {
     if (username.trim().isEmpty || password.isEmpty) {
-      throw const AppException('请输入用户名和密码');
+      throw AppException(emptyCredentialsMessage);
     }
     final result = await _repository.login(
       username: username,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../extensions/context_ext.dart';
+
 class AppDialog {
   AppDialog._();
 
@@ -7,12 +9,12 @@ class AppDialog {
       showDialog<void>(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('处理失败'),
+          title: Text(context.l10n.commonErrorTitle),
           content: Text(message),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('知道了'),
+              child: Text(context.l10n.commonOk),
             ),
           ],
         ),
@@ -22,16 +24,16 @@ class AppDialog {
     final result = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('请确认'),
+        title: Text(context.l10n.commonConfirmTitle),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('确认'),
+            child: Text(context.l10n.commonConfirm),
           ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'mock_auth_json.dart';
 import 'mock_customer_json.dart';
+import 'mock_diagnostics_json.dart';
 import 'mock_identity_json.dart';
 
 typedef MockResponseBuilder = String Function(Map<String, dynamic> query);
@@ -89,6 +90,15 @@ class MockRuleRegistry {
       description: '返回证件更新成功',
       defaultEnabled: true,
       responseBuilder: (_) => MockIdentityJson.updateSuccess,
+    ),
+    MockRule(
+      id: 'diagnostics.business_log.upload',
+      method: 'POST',
+      path: '/diagnostics/business-log/upload',
+      name: '业务日志上传',
+      description: '接收前端业务追踪日志快照',
+      defaultEnabled: true,
+      responseBuilder: (_) => MockDiagnosticsJson.uploadBusinessLogSuccess,
     ),
   ];
 

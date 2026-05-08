@@ -1,4 +1,5 @@
 import '../../customer_detail/domain/customer_profile.dart';
+import '../domain/customer_update_field_error.dart';
 
 /// 客户资料修改页面状态。
 ///
@@ -34,7 +35,7 @@ class CustomerUpdateState {
   final String contactMethod;
   final DateTime? birthday;
   final String? errorMessage;
-  final Map<String, String> fieldErrors;
+  final Map<String, CustomerUpdateFieldError> fieldErrors;
   final bool submittedOnce;
 
   CustomerUpdateState copyWith({
@@ -51,7 +52,7 @@ class CustomerUpdateState {
     String? contactMethod,
     DateTime? birthday,
     String? errorMessage,
-    Map<String, String>? fieldErrors,
+    Map<String, CustomerUpdateFieldError>? fieldErrors,
     bool? submittedOnce,
   }) => CustomerUpdateState(
     loading: loading ?? this.loading,

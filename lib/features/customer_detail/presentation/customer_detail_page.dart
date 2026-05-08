@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/router/route_paths.dart';
 import '../../../shared/extensions/datetime_ext.dart';
+import '../../../shared/extensions/context_ext.dart';
 import '../../../shared/ui/feedback/app_loading.dart';
 import '../../../shared/ui/widgets/app_button.dart';
 import '../../../shared/ui/widgets/app_error_view.dart';
@@ -17,8 +18,9 @@ class CustomerDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detail = ref.watch(customerDetailControllerProvider(customerId));
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: Text('客户详情 $customerId')),
+      appBar: AppBar(title: Text(l10n.customerDetailTitle(customerId))),
       body: detail.when(
         loading: () => const AppLoading(),
         error: (e, _) => AppErrorView(
@@ -40,28 +42,31 @@ class CustomerDetailPage extends ConsumerWidget {
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 12),
-                    _Info('邮箱', c.email),
-                    _Info('手机', StringUtils.maskMobile(c.mobile)),
-                    _Info('认证状态', c.status),
+                    _Info(l10n.customerEmail, c.email),
                     _Info(
-                      '行业/职业',
+                      l10n.customerMobile,
+                      StringUtils.maskMobile(c.mobile),
+                    ),
+                    _Info(l10n.customerVerificationStatus, c.status),
+                    _Info(
+                      l10n.customerIndustryProfession,
                       '${c.industryName ?? '-'} / ${c.professionName ?? '-'}',
                     ),
-                    _Info('最近更新', c.lastUpdatedAt.ymdHm),
+                    _Info(l10n.customerLastUpdated, c.lastUpdatedAt.ymdHm),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 16),
             AppButton(
-              label: '修改资料',
+              label: l10n.customerEditProfile,
               icon: Icons.edit_outlined,
               onPressed: () =>
                   context.push(RoutePaths.customerUpdate(customerId)),
             ),
             const SizedBox(height: 12),
             AppButton(
-              label: '更新证件',
+              label: l10n.customerUpdateIdentity,
               icon: Icons.badge_outlined,
               onPressed: () =>
                   context.push(RoutePaths.identityUpdate(customerId)),

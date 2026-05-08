@@ -21,9 +21,10 @@ class IdentityUpdateUseCase {
   Future<void> submit({
     required String customerId,
     required OcrResult identity,
+    required String faceVerifyFailedMessage,
   }) async {
     final face = await _faceVerifyService.verify();
-    if (!face.passed) throw Exception('活体验证未通过');
+    if (!face.passed) throw Exception(faceVerifyFailedMessage);
     final payload = {
       'customer_id': customerId,
       'id_name': identity.idName,

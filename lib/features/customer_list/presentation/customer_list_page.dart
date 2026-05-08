@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/router/route_paths.dart';
 import '../../../shared/extensions/datetime_ext.dart';
+import '../../../shared/extensions/context_ext.dart';
 import '../../../shared/ui/feedback/app_loading.dart';
 import '../../../shared/ui/widgets/app_empty_view.dart';
 import '../../../shared/ui/widgets/app_error_view.dart';
@@ -16,8 +17,9 @@ class CustomerListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final customers = ref.watch(customerListControllerProvider);
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('客户资料管理')),
+      appBar: AppBar(title: Text(l10n.customerListTitle)),
       body: customers.when(
         loading: () => const AppLoading(),
         error: (e, _) => AppErrorView(
@@ -26,7 +28,9 @@ class CustomerListPage extends ConsumerWidget {
               ref.read(customerListControllerProvider.notifier).refresh(),
         ),
         data: (items) {
-          if (items.isEmpty) return const AppEmptyView(message: '暂无客户资料');
+          if (items.isEmpty) {
+            return AppEmptyView(message: l10n.customerListEmpty);
+          }
           return RefreshIndicator(
             onRefresh: () =>
                 ref.read(customerListControllerProvider.notifier).refresh(),

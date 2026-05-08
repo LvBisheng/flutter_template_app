@@ -6,6 +6,7 @@ import '../../../core/network/api_client.dart';
 import '../../customer_detail/domain/customer_profile.dart';
 import '../data/customer_update_api.dart';
 import '../data/customer_update_repository_impl.dart';
+import '../domain/customer_update_field_error.dart';
 import '../domain/customer_update_policy.dart';
 import '../domain/customer_update_use_case.dart';
 import 'customer_update_state.dart';
@@ -74,7 +75,7 @@ class CustomerUpdateController extends StateNotifier<CustomerUpdateState> {
         : next;
   }
 
-  Future<String?> submit() async {
+  Future<CustomerUpdateFieldError?> submit() async {
     final fieldErrors = CustomerUpdatePolicy.validateFields(state);
     state = state.copyWith(fieldErrors: fieldErrors, submittedOnce: true);
     if (fieldErrors.isNotEmpty) {
@@ -108,7 +109,7 @@ class CustomerUpdateController extends StateNotifier<CustomerUpdateState> {
       return null;
     } catch (e) {
       appLogger.e('Customer update submit failed', error: e);
-      return e.toString();
+      rethrow;
     } finally {
       state = state.copyWith(submitting: false);
     }

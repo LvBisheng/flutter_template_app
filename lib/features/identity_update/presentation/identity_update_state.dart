@@ -1,26 +1,34 @@
 import '../../../capabilities/ocr/ocr_result.dart';
 
+enum IdentityUpdateStep {
+  waitingOcr,
+  scanning,
+  ocrCompleted,
+  signing,
+  completed,
+}
+
 class IdentityUpdateState {
   const IdentityUpdateState({
     this.scanning = false,
     this.submitting = false,
     this.identity,
-    this.stepText = '等待 OCR',
+    this.step = IdentityUpdateStep.waitingOcr,
   });
   final bool scanning;
   final bool submitting;
   final OcrResult? identity;
-  final String stepText;
+  final IdentityUpdateStep step;
 
   IdentityUpdateState copyWith({
     bool? scanning,
     bool? submitting,
     OcrResult? identity,
-    String? stepText,
+    IdentityUpdateStep? step,
   }) => IdentityUpdateState(
     scanning: scanning ?? this.scanning,
     submitting: submitting ?? this.submitting,
     identity: identity ?? this.identity,
-    stepText: stepText ?? this.stepText,
+    step: step ?? this.step,
   );
 }

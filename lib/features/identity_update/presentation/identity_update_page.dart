@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/l10n/generated/app_localizations.dart';
 import '../../../app/router/route_paths.dart';
+import '../../../shared/extensions/context_ext.dart';
 import '../../../shared/extensions/datetime_ext.dart';
 import '../../../shared/ui/feedback/app_dialog.dart';
 import '../../../shared/ui/widgets/app_button.dart';
 import '../../../shared/ui/widgets/app_text_field.dart';
 import 'identity_update_controller.dart';
+import 'identity_update_state.dart';
 
 class IdentityUpdatePage extends ConsumerWidget {
   const IdentityUpdatePage({super.key, required this.customerId});
@@ -20,21 +23,24 @@ class IdentityUpdatePage extends ConsumerWidget {
       identityUpdateControllerProvider(customerId).notifier,
     );
     final identity = state.identity;
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('证件更新')),
+      appBar: AppBar(title: Text(l10n.identityUpdateTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Card(
             child: ListTile(
               leading: const Icon(Icons.timeline),
-              title: Text(state.stepText),
-              subtitle: const Text('OCR -> 活体验证 -> Soft Token 签名 -> 提交接口'),
+              title: Text(state.step.localize(l10n)),
+              subtitle: Text(l10n.identityFlowDescription),
             ),
           ),
           const SizedBox(height: 12),
           AppButton(
-            label: identity == null ? '开始 OCR' : '重新 OCR',
+            label: identity == null
+                ? l10n.identityStartOcr
+                : l10n.identityRescanOcr,
             loading: state.scanning,
             icon: Icons.document_scanner_outlined,
             onPressed: controller.scan,
@@ -42,33 +48,36 @@ class IdentityUpdatePage extends ConsumerWidget {
           const SizedBox(height: 16),
           if (identity != null) ...[
             AppTextField(
-              label: '证件姓名',
+              label: l10n.identityName,
               initialValue: identity.idName,
               onChanged: controller.updateName,
             ),
             const SizedBox(height: 12),
             AppTextField(
-              label: '证件号码',
+              label: l10n.identityNumber,
               initialValue: identity.idNumber,
               onChanged: controller.updateIdNumber,
             ),
             const SizedBox(height: 12),
-            _Info('出生日期', identity.birthday.ymd),
-            _Info('证件有效期', identity.expiryDate.ymd),
+            _Info(l10n.identityBirthday, identity.birthday.ymd),
+            _Info(l10n.identityExpiryDate, identity.expiryDate.ymd),
             const SizedBox(height: 20),
             AppButton(
-              label: '下一步并提交',
+              label: l10n.identitySubmitNext,
               loading: state.submitting,
               onPressed: () async {
                 try {
-                  await controller.submit();
+                  await controller.submit(
+                    scanRequiredMessage: l10n.identityScanRequired,
+                    faceVerifyFailedMessage: l10n.identityFaceVerifyFailed,
+                  );
                   if (context.mounted) {
                     context.go(
                       Uri(
                         path: RoutePaths.result,
                         queryParameters: {
-                          'title': '证件信息已更新',
-                          'message': 'OCR、活体验证和 Soft Token mock 流程已完成。',
+                          'title': l10n.identityResultTitle,
+                          'message': l10n.identityResultMessage,
                         },
                       ).toString(),
                     );
@@ -83,6 +92,16 @@ class IdentityUpdatePage extends ConsumerWidget {
       ),
     );
   }
+}
+
+extension on IdentityUpdateStep {
+  String localize(AppLocalizations l10n) => switch (this) {
+    IdentityUpdateStep.waitingOcr => l10n.identityStepWaitingOcr,
+    IdentityUpdateStep.scanning => l10n.identityStepScanning,
+    IdentityUpdateStep.ocrCompleted => l10n.identityStepOcrCompleted,
+    IdentityUpdateStep.signing => l10n.identityStepSigning,
+    IdentityUpdateStep.completed => l10n.identityStepCompleted,
+  };
 }
 
 class _Info extends StatelessWidget {

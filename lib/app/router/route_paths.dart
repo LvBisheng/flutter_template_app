@@ -3,7 +3,9 @@ class RoutePaths {
 
   static const login = '/login';
   static const home = '/home';
+  static const demos = '/home/demos';
   static const customers = '/home/customers';
+  static const businessLogDemo = '/home/demos/business-log';
   static const settings = '/home/settings';
   static String customer(String id) => '/customer/$id';
   static String customerUpdate(String id) => '/customer/$id/update';

@@ -1,5 +1,6 @@
 import '../../customer_detail/domain/customer_profile.dart';
 import '../presentation/customer_update_state.dart';
+import 'customer_update_field_error.dart';
 import 'customer_update_policy.dart';
 import 'customer_update_repository.dart';
 
@@ -13,6 +14,6 @@ class CustomerUpdateUseCase {
   Future<void> submit(CustomerProfile profile) =>
       _repository.updateProfile(profile);
 
-  String? validate(CustomerUpdateState state) =>
+  CustomerUpdateFieldError? validate(CustomerUpdateState state) =>
       CustomerUpdatePolicy.validate(state);
 }

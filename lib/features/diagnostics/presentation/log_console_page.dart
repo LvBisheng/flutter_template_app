@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../../../core/logging/app_logger.dart';
+import '../../../shared/extensions/context_ext.dart';
 
 class LogConsolePage extends StatelessWidget {
   const LogConsolePage({super.key});
@@ -10,7 +11,7 @@ class LogConsolePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return TalkerScreen(
       talker: appTalker,
-      appBarTitle: '诊断日志',
+      appBarTitle: context.l10n.devToolLogTitle,
       isLogOrderReversed: true,
     );
   }

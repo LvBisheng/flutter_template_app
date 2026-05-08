@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../extensions/context_ext.dart';
+
 class AppErrorView extends StatelessWidget {
   const AppErrorView({super.key, required this.message, this.onRetry});
   final String message;
@@ -17,7 +19,7 @@ class AppErrorView extends StatelessWidget {
             TextButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('重试'),
+              label: Text(context.l10n.commonRetry),
             ),
         ],
       ),

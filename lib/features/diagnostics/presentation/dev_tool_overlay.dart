@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,8 +8,12 @@ import '../../../app/router/app_router.dart';
 import '../../../capabilities/auth/session_manager.dart';
 import '../../../core/logging/app_logger.dart';
 import '../../../core/network/mock/mock_config.dart';
+import '../../../shared/extensions/context_ext.dart';
 import '../../../shared/utils/string_utils.dart';
 import 'log_console_page.dart';
+import 'mock_tool_page.dart';
+import 'runtime_error_controller.dart';
+import 'runtime_error_page.dart';
 
 /// 非生产包的全局开发工具入口。
 ///
@@ -26,10 +31,35 @@ class DevToolOverlay extends ConsumerStatefulWidget {
 
 class _DevToolOverlayState extends ConsumerState<DevToolOverlay> {
   bool _panelVisible = false;
+  bool _runtimeErrorDialogVisible = false;
+  int? _shownRuntimeErrorId;
 
   @override
   Widget build(BuildContext context) {
     final env = ref.watch(envConfigProvider);
+    ref.listen(runtimeErrorControllerProvider.select((state) => state.latest), (
+      previous,
+      next,
+    ) {
+      if (next == null ||
+          _shownRuntimeErrorId == next.id ||
+          !env.switchEnabled ||
+          kReleaseMode) {
+        return;
+      }
+      _shownRuntimeErrorId = next.id;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (_runtimeErrorDialogVisible) return;
+        final navigatorContext = rootNavigatorKey.currentContext;
+        if (navigatorContext == null) return;
+        _runtimeErrorDialogVisible = true;
+        showDialog<void>(
+          context: navigatorContext,
+          builder: (_) => RuntimeErrorSnackDialog(report: next),
+        ).whenComplete(() => _runtimeErrorDialogVisible = false);
+      });
+    });
     if (!env.switchEnabled) return widget.child;
 
     return Stack(
@@ -91,7 +121,9 @@ class _DevToolPanel extends ConsumerWidget {
     final env = ref.watch(envConfigProvider);
     final mock = ref.watch(mockConfigProvider);
     final auth = ref.watch(sessionManagerProvider);
+    final runtimeErrors = ref.watch(runtimeErrorControllerProvider);
     final mockAllowed = env.env != AppEnv.prd;
+    final l10n = context.l10n;
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -122,7 +154,7 @@ class _DevToolPanel extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      '开发工具',
+                      l10n.devToolTitle,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
@@ -131,12 +163,18 @@ class _DevToolPanel extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               _InfoCard(
-                title: '当前网络',
+                title: l10n.devToolCurrentNetwork,
                 lines: [
-                  '环境：${env.env.name}',
+                  l10n.devToolEnvLine(env.env.name),
                   'Base URL：${env.baseUrl}',
-                  'Mock 总开关：${mockAllowed ? (mock.masterEnabled ? '开启' : '关闭') : 'prd 禁用'}',
-                  '已 Mock 接口：${mock.enabledRules.length} 个',
+                  l10n.devToolMockMasterLine(
+                    mockAllowed
+                        ? (mock.masterEnabled
+                              ? l10n.devToolMockOn
+                              : l10n.devToolMockOff)
+                        : l10n.devToolMockPrdDisabled,
+                  ),
+                  l10n.devToolMockedApiCountLine(mock.enabledRules.length),
                 ],
               ),
               const SizedBox(height: 12),
@@ -157,65 +195,31 @@ class _DevToolPanel extends ConsumerWidget {
                     ),
                 ],
               ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('接口 Mock 总开关'),
-                subtitle: Text(
-                  mockAllowed ? '开启后，只拦截下方启用的接口' : 'prd 环境不允许接口 Mock',
-                ),
-                value: mock.masterEnabled,
-                onChanged: mockAllowed
-                    ? (enabled) {
-                        ref
-                            .read(mockConfigProvider.notifier)
-                            .setMasterEnabled(enabled);
-                        appLogger.i('Mock master switch changed: $enabled');
-                      }
-                    : null,
-              ),
-              ExpansionTile(
-                tilePadding: EdgeInsets.zero,
+              ListTile(
                 leading: const Icon(Icons.rule_folder_outlined),
-                title: const Text('接口 Mock 规则'),
+                title: Text(l10n.devToolMockRules),
                 subtitle: Text(
                   mock.enabledRules.isEmpty
-                      ? '当前没有接口被 mock'
-                      : mock.enabledRules
-                            .map((rule) => rule.routeKey)
-                            .join('\n'),
+                      ? l10n.devToolNoMockedApi
+                      : l10n.devToolMockedApiCountLine(
+                          mock.enabledRules.length,
+                        ),
                 ),
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton.icon(
-                      onPressed: mockAllowed
-                          ? () => ref
-                                .read(mockConfigProvider.notifier)
-                                .enableDefaultRules()
-                          : null,
-                      icon: const Icon(Icons.restore),
-                      label: const Text('恢复默认 Mock 规则'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  onClose();
+                  rootNavigatorKey.currentState?.push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const MockToolPage(),
                     ),
-                  ),
-                  for (final rule in mock.availableRules)
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text('${rule.method} ${rule.path}'),
-                      subtitle: Text('${rule.name}：${rule.description}'),
-                      value: mock.enabledRuleIds.contains(rule.id),
-                      onChanged: mockAllowed && mock.masterEnabled
-                          ? (enabled) => ref
-                                .read(mockConfigProvider.notifier)
-                                .setRuleEnabled(rule.id, enabled)
-                          : null,
-                    ),
-                ],
+                  );
+                },
               ),
               const Divider(height: 24),
               ListTile(
                 leading: const Icon(Icons.receipt_long_outlined),
-                title: const Text('查看日志'),
-                subtitle: Text('当前 ${appTalker.history.length} 条'),
+                title: Text(l10n.devToolViewLogs),
+                subtitle: Text(l10n.devToolLogCount(appTalker.history.length)),
                 onTap: () {
                   onClose();
                   rootNavigatorKey.currentState?.push(
@@ -226,8 +230,23 @@ class _DevToolPanel extends ConsumerWidget {
                 },
               ),
               ListTile(
+                leading: const Icon(Icons.bug_report_outlined),
+                title: Text(l10n.runtimeErrorTitle),
+                subtitle: Text(
+                  l10n.runtimeErrorCount(runtimeErrors.reports.length),
+                ),
+                onTap: () {
+                  onClose();
+                  rootNavigatorKey.currentState?.push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const RuntimeErrorListPage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.cleaning_services_outlined),
-                title: const Text('清空日志'),
+                title: Text(l10n.devToolClearLogs),
                 onTap: () {
                   appTalker.cleanHistory();
                   appLogger.i('Diagnostics log history cleaned from dev panel');
@@ -236,16 +255,16 @@ class _DevToolPanel extends ConsumerWidget {
               ),
               ListTile(
                 leading: const Icon(Icons.person_search_outlined),
-                title: const Text('当前登录用户'),
+                title: Text(l10n.devToolCurrentUser),
                 subtitle: Text(
                   auth.isLoggedIn
                       ? '${auth.userName ?? '-'} / ${StringUtils.maskToken(auth.token ?? '')}'
-                      : '未登录',
+                      : l10n.settingsNotLoggedIn,
                 ),
               ),
               ListTile(
                 leading: const Icon(Icons.delete_outline),
-                title: const Text('清除 Token'),
+                title: Text(l10n.settingsClearToken),
                 enabled: auth.isLoggedIn,
                 onTap: auth.isLoggedIn
                     ? () async {
@@ -260,10 +279,20 @@ class _DevToolPanel extends ConsumerWidget {
               const Divider(height: 24),
               ListTile(
                 leading: const Icon(Icons.extension_outlined),
-                title: const Text('Mock 工具'),
-                subtitle: const Text('预留入口：接口错误注入、假数据场景、功能开关'),
+                title: Text(l10n.devToolMockTools),
+                subtitle: Text(l10n.devToolMockToolsSubtitle),
                 onTap: () {
                   appLogger.i('Mock tools placeholder tapped');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.warning_amber_outlined),
+                title: Text(l10n.runtimeErrorTriggerTest),
+                subtitle: Text(l10n.runtimeErrorTriggerTestSubtitle),
+                onTap: () {
+                  Future<void>.microtask(() {
+                    throw StateError('Manual runtime error from dev panel');
+                  });
                 },
               ),
             ],

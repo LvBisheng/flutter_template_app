@@ -11,7 +11,11 @@ class AppLogInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    appLogger.e(err.message, error: err);
+    // TalkerDioLogger 已经记录完整 http-error，这里只保留一条轻量业务日志，
+    // 避免同一个网络失败在 Talker Error 页面里重复刷屏。
+    appLogger.w(
+      'HTTP ${err.requestOptions.method} ${err.requestOptions.uri} failed',
+    );
     handler.next(err);
   }
 }

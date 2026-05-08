@@ -5,6 +5,7 @@ import 'app/env/env_config.dart';
 import 'capabilities/auth/session_manager.dart';
 import 'core/logging/app_logger.dart';
 import 'core/storage/local_storage.dart';
+import 'features/diagnostics/presentation/global_error_handler.dart';
 
 /// 应用启动入口。
 ///
@@ -15,6 +16,7 @@ Future<void> bootstrap(void Function(ProviderContainer container) run) async {
   await LocalStorage.init();
   EnvConfig.restore();
   final container = ProviderContainer();
+  installGlobalErrorHandlers(container);
   await container.read(sessionManagerProvider.notifier).restore();
   appLogger.i('App bootstrap completed');
   run(container);
