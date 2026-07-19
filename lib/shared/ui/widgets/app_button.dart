@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../screen/screen.dart';
+
 /// 统一按钮封装。
 ///
 /// 企业 App 中按钮状态、loading、禁用样式需要保持一致；页面只表达“能否点击”和
@@ -21,9 +23,9 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final child = loading
-        ? const SizedBox(
-            width: 18,
-            height: 18,
+        ? SizedBox(
+            width: 18.s,
+            height: 18.s,
             child: CircularProgressIndicator(
               strokeWidth: 2,
               color: Colors.white,
@@ -34,15 +36,21 @@ class AppButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (icon != null) ...[
-                Icon(icon, size: 18),
-                const SizedBox(width: 8),
+                Icon(icon, size: 18.s),
+                SizedBox(width: 8.s),
               ],
-              Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
+              Flexible(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 16.sp),
+                ),
+              ),
             ],
           );
     return SizedBox(
       width: double.infinity,
-      height: 48,
+      height: 48.s,
       child: FilledButton(onPressed: loading ? null : onPressed, child: child),
     );
   }

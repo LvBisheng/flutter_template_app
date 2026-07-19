@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_enterprise_starter/features/customer/routing/customer_routes.dart';
 
-import '../../../app/router/route_paths.dart';
 import '../../../shared/extensions/context_ext.dart';
+import '../../../shared/routing/app_route_stack.dart';
 import '../../../shared/ui/widgets/app_button.dart';
+import '../../../shared/ui/widgets/common_app_bar.dart';
 
 class ResultPage extends StatelessWidget {
   const ResultPage({super.key, required this.title, required this.message});
@@ -12,7 +13,7 @@ class ResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(context.l10n.resultTitle)),
+    appBar: CommonAppBar(title: context.l10n.resultTitle, showBackButton: false,),
     body: Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -27,7 +28,10 @@ class ResultPage extends StatelessWidget {
           AppButton(
             label: context.l10n.resultBackCustomers,
             icon: Icons.home_outlined,
-            onPressed: () => context.go(RoutePaths.customers),
+            onPressed: () => context.popUntilRouteNameOrGo(
+              routeName: CustomerRoutes.customersName,
+              fallbackLocation: CustomerRoutes.customersPath,
+            ),
           ),
         ],
       ),

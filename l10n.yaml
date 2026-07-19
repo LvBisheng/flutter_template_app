@@ -1,6 +1,63 @@
+# ─────────────────────────────────────────────────────────────────────
+# Flutter 国际化代码生成配置文件
+# ─────────────────────────────────────────────────────────────────────
+#
+# 这个文件告诉 `flutter gen-l10n` 命令如何生成国际化代码。
+#
+# 【工作流程】
+# 1. 开发者在 ARB 文件中编辑文案（JSON 格式）
+# 2. 运行 `flutter gen-l10n` 命令
+# 3. Flutter 读取本配置文件，找到 ARB 文件
+# 4. 自动生成 Dart 代码到 output-dir 目录
+#
+# 【ARB 文件是什么？】
+# ARB = Application Resource Bundle
+# 是一种标准的国际化资源格式（JSON 语法）。
+# - app_zh.arb：中文文案
+# - app_en.arb：英文文案
+# - 文件名格式：app_<语言代码>.arb
+#
+# 【生成的代码在哪？】
+# lib/app/l10n/generated/
+# ├── app_localizations.dart      # 抽象基类 + 委托
+# ├── app_localizations_zh.dart  # 中文实现
+# └── app_localizations_en.dart  # 英文实现
+#
+# 【如何使用生成的代码？】
+# 1. 在 MaterialApp 中配置：
+#    localizationsDelegates: AppLocalizations.localizationsDelegates,
+#    supportedLocales: AppLocalizations.supportedLocales,
+#
+# 2. 在代码中获取文案：
+#    final l10n = AppLocalizations.of(context);
+#    Text(l10n.loginTitle);
+#
+# ─────────────────────────────────────────────────────────────────────
+
+# ARB 文件所在目录（存放文案的 JSON 文件）
 arb-dir: lib/app/l10n
+
+# 模板 ARB 文件。
+# Flutter 会以此为基准生成抽象基类。
+# 通常选择"主语言"作为模板（本项目是中文）。
 template-arb-file: app_zh.arb
+
+# 生成代码的输出目录。
+# 注意：这个目录下的文件是自动生成的，不要手动修改！
 output-dir: lib/app/l10n/generated
+
+# 生成的入口文件名（类名对应的文件）。
+# 生成后会包含：
+# - AppLocalizations（抽象基类）
+# - AppLocalizationsDelegate（委托，用于 MaterialApp）
+# - supportedLocales（支持的语言列表）
 output-localization-file: app_localizations.dart
+
+# 生成的类名。
+# 代码中使用：AppLocalizations.of(context).xxx
 output-class: AppLocalizations
+
+# 是否允许 getter 返回 null。
+# false：所有文案必须有默认值（推荐，避免使用时判空）
+# true：未找到文案时返回 null
 nullable-getter: false

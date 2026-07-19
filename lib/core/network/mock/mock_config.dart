@@ -1,15 +1,24 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/env/app_env.dart';
 import '../../../app/env/env_config.dart';
 import '../../storage/local_storage.dart';
 import 'mock_rule.dart';
 
-/// 接口 Mock 的运行时配置。
+/// ─────────────────────────────────────────────────────────────────────
+/// Mock 配置。
+/// ─────────────────────────────────────────────────────────────────────
 ///
-/// 注意：Mock 是“接口覆盖能力”，不是环境。用户可以在 sit/uat 等真实环境下
-/// 只 mock 某几个接口，其余接口仍然走当前 baseUrl。prd 环境会强制禁用。
+/// 【设计说明】
+/// Mock 是”接口覆盖能力”，不是环境：
+/// - 用户可以在 sit/uat 等真实环境下
+/// - 只 mock 某几个接口，其余接口仍然走当前 baseUrl
+/// - prd 环境会强制禁用
+///
+/// 【字段说明】
+/// - [masterEnabled]：Mock 总开关
+/// - [enabledRuleIds]：已启用的规则 ID 集合
+/// - [availableRules]：所有可用规则列表
+///
 class MockConfig {
   const MockConfig({
     required this.masterEnabled,
@@ -21,11 +30,13 @@ class MockConfig {
   final Set<String> enabledRuleIds;
   final List<MockRule> availableRules;
 
+  /// 获取已启用的规则列表。
   List<MockRule> get enabledRules => [
     for (final rule in availableRules)
       if (enabledRuleIds.contains(rule.id)) rule,
   ];
 
+  /// 检查指定规则是否启用。
   bool isRuleEnabled(String id) => masterEnabled && enabledRuleIds.contains(id);
 
   MockConfig copyWith({bool? masterEnabled, Set<String>? enabledRuleIds}) {
@@ -37,10 +48,27 @@ class MockConfig {
   }
 }
 
+/// MockConfig Provider。
 final mockConfigProvider = NotifierProvider<MockConfigController, MockConfig>(
   MockConfigController.new,
 );
 
+/// ─────────────────────────────────────────────────────────────────────
+/// Mock 配置 Controller。
+/// ─────────────────────────────────────────────────────────────────────
+///
+/// 【职责】
+/// 管理 Mock 配置的状态持久化。
+///
+/// 【存储】
+/// - 总开关：LocalStorage 'mock_master_enabled'
+/// - 规则列表：LocalStorage 'mock_enabled_rule_ids'
+///
+/// 【安全保护】
+/// - Release 包强制禁用
+/// - PRD 环境强制禁用
+/// - 所有修改方法都做二次校验
+///
 class MockConfigController extends Notifier<MockConfig> {
   static const _masterKey = 'mock_master_enabled';
   static const _rulesKey = 'mock_enabled_rule_ids';
@@ -48,14 +76,17 @@ class MockConfigController extends Notifier<MockConfig> {
   @override
   MockConfig build() {
     final env = ref.watch(envConfigProvider);
-    // prd 和生产锁定包都不允许 mock，避免测试数据或假流程进入生产验证链路。
-    if (!env.switchEnabled || kReleaseMode || env.env == AppEnv.prd) {
+
+    // 非开发模式强制禁用 Mock，避免测试数据进入生产环境
+    if (!env.isDevMode) {
       return MockConfig(
         masterEnabled: false,
         enabledRuleIds: const {},
         availableRules: MockRuleRegistry.rules,
       );
     }
+
+    // 从本地存储恢复配置
     final storedRules = LocalStorage.getStringList(_rulesKey);
     return MockConfig(
       masterEnabled: LocalStorage.getBool(_masterKey) ?? true,
@@ -64,16 +95,23 @@ class MockConfigController extends Notifier<MockConfig> {
     );
   }
 
+  /// 设置 Mock 总开关。
+  ///
+  /// 【安全】
+  /// 非开发模式不允许开启。
   Future<void> setMasterEnabled(bool enabled) async {
-    // 即使 UI 没有禁用，Controller 仍然做一次保护，避免外部误调用。
-    if (ref.read(envConfigProvider).env == AppEnv.prd) return;
+    if (!ref.read(envConfigProvider).isDevMode) return;
     state = state.copyWith(masterEnabled: enabled);
     await LocalStorage.setBool(_masterKey, enabled);
   }
 
+  /// 设置单个规则的开关。
+  ///
+  /// 【安全】
+  /// 非开发模式不允许开启任何规则。
   Future<void> setRuleEnabled(String ruleId, bool enabled) async {
-    // 单接口规则同样不能在 prd 下被开启。
-    if (ref.read(envConfigProvider).env == AppEnv.prd) return;
+    if (!ref.read(envConfigProvider).isDevMode) return;
+
     final next = {...state.enabledRuleIds};
     if (enabled) {
       next.add(ruleId);
@@ -84,14 +122,17 @@ class MockConfigController extends Notifier<MockConfig> {
     await LocalStorage.setStringList(_rulesKey, next.toList()..sort());
   }
 
+  /// 启用默认规则（重置为初始状态）。
   Future<void> enableDefaultRules() async {
-    if (ref.read(envConfigProvider).env == AppEnv.prd) return;
+    if (!ref.read(envConfigProvider).isDevMode) return;
+
     final defaults = _defaultRuleIds();
     state = state.copyWith(masterEnabled: true, enabledRuleIds: defaults);
     await LocalStorage.setBool(_masterKey, true);
     await LocalStorage.setStringList(_rulesKey, defaults.toList()..sort());
   }
 
+  /// 获取默认启用的规则 ID。
   static Set<String> _defaultRuleIds() => {
     for (final rule in MockRuleRegistry.rules)
       if (rule.defaultEnabled) rule.id,

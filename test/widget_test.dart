@@ -6,8 +6,8 @@ import 'package:flutter_enterprise_starter/core/logging/business_trace_logger.da
 import 'package:flutter_enterprise_starter/core/logging/long_log_printer.dart';
 import 'package:flutter_enterprise_starter/core/network/mock/mock_config.dart';
 import 'package:flutter_enterprise_starter/core/network/mock/mock_customer_json.dart';
-import 'package:flutter_enterprise_starter/features/customer_update/domain/customer_update_policy.dart';
-import 'package:flutter_enterprise_starter/features/customer_update/presentation/customer_update_state.dart';
+import 'package:flutter_enterprise_starter/features/customer/update/domain/customer_update_policy.dart';
+import 'package:flutter_enterprise_starter/features/customer/update/presentation/customer_update_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

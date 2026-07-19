@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/env/app_env.dart';
 import '../../../app/env/env_config.dart';
 import '../../../core/logging/app_logger.dart';
 import '../../../core/network/mock/mock_config.dart';
 import '../../../shared/extensions/context_ext.dart';
+import '../../../shared/ui/widgets/common_app_bar.dart';
 
 class MockToolPage extends ConsumerWidget {
   const MockToolPage({super.key});
@@ -14,11 +14,11 @@ class MockToolPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final env = ref.watch(envConfigProvider);
     final mock = ref.watch(mockConfigProvider);
-    final mockAllowed = env.env != AppEnv.prd;
+    final mockAllowed = env.isDevMode;
     final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.mockToolTitle)),
+      appBar: CommonAppBar(title: l10n.mockToolTitle),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

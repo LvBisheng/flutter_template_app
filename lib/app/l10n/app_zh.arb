@@ -1,5 +1,7 @@
 {
   "@@locale": "zh",
+
+  "@commonSection": { "_comment": "════════════════════════════ 通用文案 ════════════════════════════" },
   "appTitle": "Flutter Enterprise Starter",
   "commonRetry": "重试",
   "commonNoData": "暂无数据",
@@ -9,9 +11,17 @@
   "commonConfirmTitle": "请确认",
   "commonCancel": "取消",
   "commonConfirm": "确认",
+  "exitConfirmTitle": "退出应用",
+  "exitConfirmMessage": "确定要退出应用吗？",
+
+  "@navSection": { "_comment": "════════════════════════════ 导航 ════════════════════════════" },
   "navCustomers": "客户",
+  "navAnnouncements": "首页",
   "navDemos": "Demo",
+  "navMe": "我的",
   "navSettings": "设置",
+
+  "@demoSection": { "_comment": "════════════════════════════ Demo Hub ════════════════════════════" },
   "demoHubTitle": "功能 Demo",
   "demoCustomerTitle": "客户资料管理",
   "demoCustomerSubtitle": "业务型页面、路由、网络 Mock、复杂表单和证件更新流程",
@@ -22,10 +32,18 @@
   "demoBusinessLogUploadSuccess": "日志上传成功",
   "demoBusinessLogUploadSkipped": "日志上传已跳过",
   "demoBusinessLogUploadFailed": "日志上传失败但已静默处理",
+
+  "@loginSection": { "_comment": "════════════════════════════ 登录模块 ════════════════════════════" },
   "loginUsername": "用户名",
+  "loginTitle": "Flutter 企业模板",
   "loginPassword": "密码",
   "loginSubmit": "登录",
   "loginEmptyCredentials": "请输入用户名和密码",
+  "loginInvalidUsername": "用户名只能输入字母、数字或下划线",
+  "loginUsernameTooShort": "用户名至少需要 4 个字符",
+  "loginPasswordTooShort": "密码至少需要 6 个字符",
+
+  "@customerSection": { "_comment": "════════════════════════════ 客户模块 ════════════════════════════" },
   "customerListTitle": "客户资料管理",
   "customerListEmpty": "暂无客户资料",
   "customerDetailTitle": "客户详情 {customerId}",
@@ -61,6 +79,8 @@
   "customerSubmitEdit": "提交修改",
   "customerUpdateSuccessTitle": "客户资料已更新",
   "customerUpdateSuccessMessage": "客户资料修改流程已通过 mock 接口完成。",
+
+  "@validationSection": { "_comment": "════════════════════════════ 表单校验 ════════════════════════════" },
   "validationRequiredName": "请输入姓名",
   "validationRequiredEmail": "请输入邮箱",
   "validationInvalidEmail": "邮箱格式不正确，例如 demo@example.com",
@@ -69,6 +89,8 @@
   "validationRequiredIndustry": "请选择行业",
   "validationRequiredProfession": "请选择职业",
   "validationAcceptedTermsRequired": "请勾选资料真实性声明",
+
+  "@industrySection": { "_comment": "════════════════════════════ 行业职业选项 ════════════════════════════" },
   "industryTech": "科技 / 互联网 / 软件与信息服务",
   "industryFinance": "金融 / 保险 / 证券与财富管理",
   "industryService": "专业服务 / 咨询 / 客户运营",
@@ -78,6 +100,8 @@
   "professionAdvisor": "私人客户顾问 / 财务规划顾问",
   "professionOperator": "客户运营经理 / 服务交付负责人",
   "professionConsultant": "业务顾问 / 实施专家",
+
+  "@identitySection": { "_comment": "════════════════════════════ 证件更新 ════════════════════════════" },
   "identityUpdateTitle": "证件更新",
   "identityFlowDescription": "OCR -> 活体验证 -> Soft Token 签名 -> 提交接口",
   "identityStartOcr": "开始 OCR",
@@ -96,33 +120,54 @@
   "identityStepCompleted": "证件更新完成",
   "identityScanRequired": "请先完成 OCR",
   "identityFaceVerifyFailed": "活体验证未通过",
+
+  "@resultSection": { "_comment": "════════════════════════════ 结果页 ════════════════════════════" },
   "resultTitle": "处理结果",
   "resultDefaultTitle": "提交成功",
   "resultDefaultMessage": "业务处理已完成。",
   "resultBackCustomers": "返回客户列表",
+
+  "@settingsSection": { "_comment": "════════════════════════════ 设置页 ════════════════════════════" },
   "settingsTitle": "设置",
-  "settingsAccount": "账号",
-  "settingsLoginStatus": "登录状态",
-  "settingsLoggedInUser": "已登录：{userName}",
-  "@settingsLoggedInUser": {
-    "placeholders": {
-      "userName": {}
-    }
-  },
-  "settingsNotLoggedIn": "未登录",
-  "settingsClearToken": "清除 Token",
   "settingsLogout": "退出登录",
   "settingsLogoutConfirm": "确认退出当前登录？",
   "settingsLanguage": "语言",
+  "settingsLanguageDescription": "选择应用显示语言，更改后立即生效。",
   "settingsLanguageSystem": "跟随系统",
+  "settingsLanguageSystemDesc": "根据系统语言自动切换",
   "settingsLanguageChinese": "简体中文",
+  "settingsLanguageTraditionalChinese": "繁體中文",
   "settingsLanguageEnglish": "English",
   "settingsAppInfo": "应用信息",
+  "settingsFontSize": "字体大小",
+  "settingsFontSizeDesc": "调整应用内字体大小",
+  "settingsFontSizeSmall": "小",
+  "settingsFontSizeStandard": "标准",
+  "settingsFontSizeLarge": "大",
+  "settingsFontSizeExtraLarge": "特大",
+  "settingsFontSizeHuge": "巨大",
+  "settingsFontSizePreview": "预览效果",
+  "settingsTheme": "深色模式",
+  "settingsThemeDescription": "选择应用主题模式，切换后立即生效",
+  "settingsThemeLight": "普通模式",
+  "settingsThemeLightDesc": "使用浅色主题",
+  "settingsThemeDark": "深色模式",
+  "settingsThemeDarkDesc": "使用深色主题",
+  "settingsThemeSystem": "跟随系统",
+  "settingsThemeSystemDesc": "自动切换深/浅色主题",
   "settingsCurrentEnv": "当前环境",
   "settingsBaseUrl": "Base URL",
   "settingsDiagnosticsTool": "诊断工具",
   "settingsFloatingButton": "右下角悬浮按钮",
   "settingsProductionDisabled": "生产包已关闭",
+
+  "@meSection": { "_comment": "════════════════════════════ 我的页 ════════════════════════════" },
+  "meTitle": "我的",
+  "meNotLoggedIn": "未登录",
+  "meTapToLogin": "点击登录",
+  "meLoggedInUser": "已登录",
+
+  "@devToolSection": { "_comment": "════════════════════════════ 开发工具 ════════════════════════════" },
   "devToolTitle": "开发工具",
   "devToolCurrentNetwork": "当前网络",
   "devToolEnvLine": "环境：{env}",
@@ -165,6 +210,8 @@
   "devToolMockTools": "Mock 工具",
   "devToolMockToolsSubtitle": "预留入口：接口错误注入、假数据场景、功能开关",
   "mockToolTitle": "Mock 管理",
+
+  "@runtimeErrorSection": { "_comment": "════════════════════════════ 运行时错误 ════════════════════════════" },
   "runtimeErrorTitle": "前端错误",
   "runtimeErrorDetailTitle": "错误详情",
   "runtimeErrorCaptured": "捕获到前端错误",
@@ -186,5 +233,9 @@
   "runtimeErrorMessage": "错误信息",
   "runtimeErrorStack": "堆栈信息",
   "runtimeErrorTriggerTest": "触发测试异常",
-  "runtimeErrorTriggerTestSubtitle": "用于验证前端错误捕获、弹框和复制能力"
+  "runtimeErrorTriggerTestSubtitle": "用于验证前端错误捕获、弹框和复制能力",
+
+  "@announcementSection": { "_comment": "════════════════════════════ 公告 ════════════════════════════" },
+  "announcementTitle": "公告列表",
+  "announcementEmpty": "暂无公告"
 }

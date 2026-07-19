@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/extensions/context_ext.dart';
 import '../../../shared/extensions/datetime_ext.dart';
 import '../../../shared/ui/feedback/app_toast.dart';
+import '../../../shared/ui/widgets/common_app_bar.dart';
 import '../domain/runtime_error_report.dart';
 import 'runtime_error_controller.dart';
 
@@ -16,8 +17,8 @@ class RuntimeErrorListPage extends ConsumerWidget {
     final state = ref.watch(runtimeErrorControllerProvider);
     final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.runtimeErrorTitle),
+      appBar: CommonAppBar(
+        title: l10n.runtimeErrorTitle,
         actions: [
           IconButton(
             tooltip: l10n.runtimeErrorClear,
@@ -71,8 +72,8 @@ class RuntimeErrorDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.runtimeErrorDetailTitle),
+      appBar: CommonAppBar(
+        title: l10n.runtimeErrorDetailTitle,
         actions: [
           IconButton(
             tooltip: l10n.runtimeErrorCopy,

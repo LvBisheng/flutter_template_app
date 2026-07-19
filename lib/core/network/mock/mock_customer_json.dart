@@ -7,7 +7,11 @@ class MockCustomerJson {
 {"code":"0000","message":"success","data":[
 {"cust_id":"C10001","cust_name":"Demo Customer A","email_addr":"alpha@example.invalid","mobile_no":"13800000001","status":"verified","last_updated_at":"2026-05-01T10:30:00Z"},
 {"cust_id":"C10002","cust_name":"Demo Customer B","email_addr":"bravo@example.invalid","mobile_no":"13800000002","status":"pending","last_updated_at":"2026-05-03T08:15:00Z"},
-{"cust_id":"C10003","cust_name":"Demo Customer C","email_addr":"charlie@example.invalid","mobile_no":"13800000003","status":"draft","last_updated_at":"2026-05-06T12:00:00Z"}
+{"cust_id":"C10003","cust_name":"Demo Customer C","email_addr":"charlie@example.invalid","mobile_no":"13800000003","status":"draft","last_updated_at":"2026-05-06T12:00:00Z"},
+{"cust_id":"C10004","cust_name":"Demo Customer D","email_addr":"charlie@example.invalid","mobile_no":"13800000003","status":"draft","last_updated_at":"2026-05-06T12:00:00Z"},
+{"cust_id":"C10005","cust_name":"Demo Customer E","email_addr":"charlie@example.invalid","mobile_no":"13800000003","status":"draft","last_updated_at":"2026-05-06T12:00:00Z"},
+{"cust_id":"C10006","cust_name":"Demo Customer F","email_addr":"charlie@example.invalid","mobile_no":"13800000003","status":"draft","last_updated_at":"2026-05-06T12:00:00Z"},
+{"cust_id":"C10007","cust_name":"Demo Customer G","email_addr":"charlie@example.invalid","mobile_no":"13800000003","status":"draft","last_updated_at":"2026-05-06T12:00:00Z"}
 ]}
 ''';
 

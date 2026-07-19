@@ -96,6 +96,7 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
     Locale('zh'),
+    Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
   ];
 
   /// No description provided for @appTitle.
@@ -152,17 +153,41 @@ abstract class AppLocalizations {
   /// **'确认'**
   String get commonConfirm;
 
+  /// No description provided for @exitConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出应用'**
+  String get exitConfirmTitle;
+
+  /// No description provided for @exitConfirmMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要退出应用吗？'**
+  String get exitConfirmMessage;
+
   /// No description provided for @navCustomers.
   ///
   /// In zh, this message translates to:
   /// **'客户'**
   String get navCustomers;
 
+  /// No description provided for @navAnnouncements.
+  ///
+  /// In zh, this message translates to:
+  /// **'首页'**
+  String get navAnnouncements;
+
   /// No description provided for @navDemos.
   ///
   /// In zh, this message translates to:
   /// **'Demo'**
   String get navDemos;
+
+  /// No description provided for @navMe.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的'**
+  String get navMe;
 
   /// No description provided for @navSettings.
   ///
@@ -236,6 +261,12 @@ abstract class AppLocalizations {
   /// **'用户名'**
   String get loginUsername;
 
+  /// No description provided for @loginTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'Flutter 企业模板'**
+  String get loginTitle;
+
   /// No description provided for @loginPassword.
   ///
   /// In zh, this message translates to:
@@ -253,6 +284,24 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'请输入用户名和密码'**
   String get loginEmptyCredentials;
+
+  /// No description provided for @loginInvalidUsername.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名只能输入字母、数字或下划线'**
+  String get loginInvalidUsername;
+
+  /// No description provided for @loginUsernameTooShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名至少需要 4 个字符'**
+  String get loginUsernameTooShort;
+
+  /// No description provided for @loginPasswordTooShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码至少需要 6 个字符'**
+  String get loginPasswordTooShort;
 
   /// No description provided for @customerListTitle.
   ///
@@ -644,36 +693,6 @@ abstract class AppLocalizations {
   /// **'设置'**
   String get settingsTitle;
 
-  /// No description provided for @settingsAccount.
-  ///
-  /// In zh, this message translates to:
-  /// **'账号'**
-  String get settingsAccount;
-
-  /// No description provided for @settingsLoginStatus.
-  ///
-  /// In zh, this message translates to:
-  /// **'登录状态'**
-  String get settingsLoginStatus;
-
-  /// No description provided for @settingsLoggedInUser.
-  ///
-  /// In zh, this message translates to:
-  /// **'已登录：{userName}'**
-  String settingsLoggedInUser(Object userName);
-
-  /// No description provided for @settingsNotLoggedIn.
-  ///
-  /// In zh, this message translates to:
-  /// **'未登录'**
-  String get settingsNotLoggedIn;
-
-  /// No description provided for @settingsClearToken.
-  ///
-  /// In zh, this message translates to:
-  /// **'清除 Token'**
-  String get settingsClearToken;
-
   /// No description provided for @settingsLogout.
   ///
   /// In zh, this message translates to:
@@ -692,17 +711,35 @@ abstract class AppLocalizations {
   /// **'语言'**
   String get settingsLanguage;
 
+  /// No description provided for @settingsLanguageDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择应用显示语言，更改后立即生效。'**
+  String get settingsLanguageDescription;
+
   /// No description provided for @settingsLanguageSystem.
   ///
   /// In zh, this message translates to:
   /// **'跟随系统'**
   String get settingsLanguageSystem;
 
+  /// No description provided for @settingsLanguageSystemDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'根据系统语言自动切换'**
+  String get settingsLanguageSystemDesc;
+
   /// No description provided for @settingsLanguageChinese.
   ///
   /// In zh, this message translates to:
   /// **'简体中文'**
   String get settingsLanguageChinese;
+
+  /// No description provided for @settingsLanguageTraditionalChinese.
+  ///
+  /// In zh, this message translates to:
+  /// **'繁體中文'**
+  String get settingsLanguageTraditionalChinese;
 
   /// No description provided for @settingsLanguageEnglish.
   ///
@@ -715,6 +752,102 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'应用信息'**
   String get settingsAppInfo;
+
+  /// No description provided for @settingsFontSize.
+  ///
+  /// In zh, this message translates to:
+  /// **'字体大小'**
+  String get settingsFontSize;
+
+  /// No description provided for @settingsFontSizeDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'调整应用内字体大小'**
+  String get settingsFontSizeDesc;
+
+  /// No description provided for @settingsFontSizeSmall.
+  ///
+  /// In zh, this message translates to:
+  /// **'小'**
+  String get settingsFontSizeSmall;
+
+  /// No description provided for @settingsFontSizeStandard.
+  ///
+  /// In zh, this message translates to:
+  /// **'标准'**
+  String get settingsFontSizeStandard;
+
+  /// No description provided for @settingsFontSizeLarge.
+  ///
+  /// In zh, this message translates to:
+  /// **'大'**
+  String get settingsFontSizeLarge;
+
+  /// No description provided for @settingsFontSizeExtraLarge.
+  ///
+  /// In zh, this message translates to:
+  /// **'特大'**
+  String get settingsFontSizeExtraLarge;
+
+  /// No description provided for @settingsFontSizeHuge.
+  ///
+  /// In zh, this message translates to:
+  /// **'巨大'**
+  String get settingsFontSizeHuge;
+
+  /// No description provided for @settingsFontSizePreview.
+  ///
+  /// In zh, this message translates to:
+  /// **'预览效果'**
+  String get settingsFontSizePreview;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In zh, this message translates to:
+  /// **'深色模式'**
+  String get settingsTheme;
+
+  /// No description provided for @settingsThemeDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择应用主题模式，切换后立即生效'**
+  String get settingsThemeDescription;
+
+  /// No description provided for @settingsThemeLight.
+  ///
+  /// In zh, this message translates to:
+  /// **'普通模式'**
+  String get settingsThemeLight;
+
+  /// No description provided for @settingsThemeLightDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用浅色主题'**
+  String get settingsThemeLightDesc;
+
+  /// No description provided for @settingsThemeDark.
+  ///
+  /// In zh, this message translates to:
+  /// **'深色模式'**
+  String get settingsThemeDark;
+
+  /// No description provided for @settingsThemeDarkDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用深色主题'**
+  String get settingsThemeDarkDesc;
+
+  /// No description provided for @settingsThemeSystem.
+  ///
+  /// In zh, this message translates to:
+  /// **'跟随系统'**
+  String get settingsThemeSystem;
+
+  /// No description provided for @settingsThemeSystemDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动切换深/浅色主题'**
+  String get settingsThemeSystemDesc;
 
   /// No description provided for @settingsCurrentEnv.
   ///
@@ -745,6 +878,30 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'生产包已关闭'**
   String get settingsProductionDisabled;
+
+  /// No description provided for @meTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的'**
+  String get meTitle;
+
+  /// No description provided for @meNotLoggedIn.
+  ///
+  /// In zh, this message translates to:
+  /// **'未登录'**
+  String get meNotLoggedIn;
+
+  /// No description provided for @meTapToLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'点击登录'**
+  String get meTapToLogin;
+
+  /// No description provided for @meLoggedInUser.
+  ///
+  /// In zh, this message translates to:
+  /// **'已登录'**
+  String get meLoggedInUser;
 
   /// No description provided for @devToolTitle.
   ///
@@ -979,6 +1136,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'用于验证前端错误捕获、弹框和复制能力'**
   String get runtimeErrorTriggerTestSubtitle;
+
+  /// No description provided for @announcementTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'公告列表'**
+  String get announcementTitle;
+
+  /// No description provided for @announcementEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无公告'**
+  String get announcementEmpty;
 }
 
 class _AppLocalizationsDelegate
@@ -999,6 +1168,18 @@ class _AppLocalizationsDelegate
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when language+script codes are specified.
+  switch (locale.languageCode) {
+    case 'zh':
+      {
+        switch (locale.scriptCode) {
+          case 'Hant':
+            return AppLocalizationsZhHant();
+        }
+        break;
+      }
+  }
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'en':

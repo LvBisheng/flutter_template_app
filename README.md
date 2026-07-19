@@ -1,6 +1,14 @@
 # Flutter Enterprise Starter App
 
-企业业务型 Flutter 模板 App，业务场景为“客户资料管理 Demo App”。项目不是 Todo Demo，也不是空目录架构，而是用于展示中大型业务 App 常见的分层、路由、状态管理、网络 Mock、复杂表单和通用业务能力封装。
+企业业务型 Flutter 模板 App，业务场景为”客户资料管理 Demo App”。项目不是 Todo Demo，也不是空目录架构，而是用于展示中大型业务 App 常见的分层、路由、状态管理、网络 Mock、复杂表单和通用业务能力封装。
+
+## 文档导航
+
+- **[README.md](README.md)** - 你正在阅读的项目主文档（技术栈、运行方式、功能列表）
+- **[CLAUDE.md](CLAUDE.md)** - AI 协作指南（给 Claude Code 等 AI 工具的快速上手文档，包含角色定位、行为准则、代码规范等）
+- **[docs/AI_WORKFLOW.md](docs/AI_WORKFLOW.md)** - AI 打磨工作流指南（如何高效地通过 AI 改进项目）
+- **[docs/AI_FEEDBACK.md](docs/AI_FEEDBACK.md)** - AI 反馈记录（沉淀 AI 给出的改进建议、问题模式、用户协作偏好）
+- **[docs/CHANGELOG.md](docs/CHANGELOG.md)** - AI 协作文档变更日志（记录文档体系的重要变更）
 
 ## 技术栈
 
@@ -17,8 +25,10 @@
 当前模板为了便于直接阅读，DTO/Entity 使用手写 Dart class。真实项目推荐逐步替换为 `freezed + json_serializable`：
 
 ```bash
-flutter pub run build_runner build --delete-conflicting-outputs
+dart run build_runner build --delete-conflicting-outputs
 ```
+
+> 当前 Flutter 3.38 / Dart 3.10 环境下，`build_runner` 固定为 `2.8.0`。升级到 `2.10+` 可能触发 `dart compile does not support build hooks`，需要等对应工具链完全兼容后再放开。
 
 ## 目录结构
 
@@ -37,6 +47,181 @@ lib/
 - `presentation`：页面、Controller、页面状态
 - `domain`：Entity、Repository 抽象、UseCase、Policy
 - `data`：API、DTO、RepositoryImpl、DTO 到 Entity 转换
+
+## 架构设计
+
+### 整体架构：Clean Architecture（简化版）
+
+本项目采用 **Clean Architecture（整洁架构）的简化版**，结合 **MVVM + 单向数据流** 实现分层和解耦。
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Presentation Layer（展示层）                                │
+│  ┌─────────────┐      ┌─────────────┐                       │
+│  │   Page      │ ←─── │  Controller │                       │
+│  │  (View)     │      │ (ViewModel) │                       │
+│  └─────────────┘      └──────┬──────┘                       │
+│                              │                               │
+│                        State（单向数据流）                    │
+└──────────────────────────────┼──────────────────────────────┘
+                               ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Domain Layer（领域层）                                       │
+│  ┌─────────────┐      ┌─────────────┐      ┌───────────┐    │
+│  │   UseCase   │ ←─── │  Repository │      │  Entity   │    │
+│  │             │      │  (抽象接口)  │      │           │    │
+│  └──────┬──────┘      └─────────────┘      └───────────┘    │
+│         │                                                    │
+│   业务逻辑（纯 Dart，不依赖 Flutter）                         │
+└─────────┼───────────────────────────────────────────────────┘
+          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Data Layer（数据层）                                         │
+│  ┌─────────────────┐      ┌─────────────┐                  │
+│  │ RepositoryImpl  │ ←─── │    API      │                  │
+│  │                 │      │  (网络请求)  │                  │
+│  └─────────────────┘      └─────────────┘                  │
+│                                                              │
+│   数据获取、缓存、DTO → Entity 转换                          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 与 MVC/MVP/MVVM 的关系
+
+| 名称 | 类型 | 说明 |
+|------|------|------|
+| **MVC** | UI 架构模式 | Model-View-Controller |
+| **MVP** | UI 架构模式 | Model-View-Presenter |
+| **MVVM** | UI 架构模式 | Model-View-ViewModel |
+| **Clean Architecture** | 系统架构 | 分层架构，关注职责分离和依赖规则 |
+
+**区别：**
+- MVC/MVP/MVVM 关注的是 **UI 层** 如何组织（View 和逻辑的关系）
+- Clean Architecture 关注的是 **整个系统** 如何分层（presentation、domain、data）
+
+本项目是 **Clean Architecture + MVVM + 单向数据流** 的组合：
+- **系统架构**：Clean Architecture（简化版三层）
+- **UI 架构**：MVVM + Unidirectional Data Flow（通过 Riverpod 实现）
+- **依赖注入**：Provider 模式（Riverpod）
+
+这不是 MVP，因为 MVP 的 Presenter 持有 View 引用，双向通信；而本项目的 Controller 不持有 Page 引用，通过 State 流驱动 UI 重建。
+
+### 数据流
+
+```
+用户输入 → Controller 状态更新 → Page 重建 → UI 更新
+```
+
+具体流程：
+1. 用户在输入框输入 "abc"
+2. onChanged 回调触发 → Controller.usernameChanged("abc", l10n)
+3. Controller 状态更新 → state = state.copyWith(username: "abc")
+4. Riverpod 通知监听者 → Page 重建
+5. AppTextField 的 initialValue 变为 "abc"
+
+### 依赖倒置原则（DIP）
+
+依赖倒置原则（Dependency Inversion Principle，DIP）是 SOLID 原则中的 **D**。
+
+**核心思想：高层模块不应依赖低层模块，两者都应依赖抽象；抽象不应依赖细节，细节应依赖抽象。**
+
+#### 传统依赖 vs 依赖倒置
+
+```
+❌ 传统依赖（高层依赖低层）
+
+┌─────────────┐
+│  Controller │ ──────→ ┌─────────────┐ ──────→ ┌─────────────┐
+│   (高层)     │        │  UseCase    │        │  Repository │
+└─────────────┘        └─────────────┘        └─────────────┘
+                             ↓                       ↓
+                        ┌─────────────┐        ┌─────────────┐
+                        │ RepositoryImpl│      │   API/DB   │
+                        └─────────────┘        └─────────────┘
+
+问题：
+- Controller 直接依赖具体的 UseCase 实现
+- UseCase 直接依赖具体的 RepositoryImpl
+- 替换实现需要改Controller 代码
+
+
+✅ 依赖倒置（高层依赖抽象）
+
+┌─────────────┐
+│  Controller │ ──────→ ┌─────────────┐
+│   (高层)     │        │ UseCase      │
+└─────────────┘        │ (抽象接口)    │
+                       └──────┬──────┘
+                              │
+                       ┌──────↓──────┐
+                       │ Repository  │
+                       │ (抽象接口)    │
+                       └──────┬──────┘
+                              │
+         ┌────────────────────┼────────────────────┐
+         ↓                    ↓                    ↓
+┌─────────────┐        ┌─────────────┐        ┌─────────────┐
+│ MockRepo    │        │ RealRepo    │        │ TestRepo    │
+│ (测试实现)   │        │ (真实实现)   │        │ (单元测试)  │
+└─────────────┘        └─────────────┘        └─────────────┘
+
+好处：
+- Controller 只依赖 UseCase 抽象
+- UseCase 只依赖 Repository 抽象
+- 替换实现不需要改高层代码
+```
+
+#### 本项目中的体现
+
+| 层 | 抽象 | 具体实现 |
+|---|------|---------|
+| Domain | `LoginRepository`（接口） | `LoginRepositoryImpl`（data 层） |
+| Domain | `LoginUseCase` | - |
+| Presentation | `loginUseCaseProvider`（Provider） | `LoginUseCase` 实例 |
+| Capabilities | `OcrService`（接口） | `MockOcrService` / `VendorOcrService` |
+
+```dart
+// ❌ 错误：直接依赖具体实现
+class LoginController {
+  void login() {
+    final useCase = LoginUseCase(// 直接 new
+      LoginRepositoryImpl(LoginApi(...)),
+      SessionManager(),
+    );
+    useCase(...);
+  }
+}
+
+// ✅ 正确：依赖抽象（通过 Provider 注入）
+class LoginController extends Notifier<LoginState> {
+  Future<void> login() async {
+    // 从 Provider 获取，不关心具体实现
+    final useCase = ref.read(loginUseCaseProvider);
+    await useCase(...);
+  }
+}
+
+// Provider 负责创建具体实例
+final loginUseCaseProvider = Provider<LoginUseCase>((ref) {
+  return LoginUseCase(
+    LoginRepositoryImpl(LoginApi(ref.read(apiClientProvider))),
+    ref.read(sessionManagerProvider.notifier),
+  );
+});
+```
+
+#### 依赖倒置的好处
+
+| 场景 | 不用 DIP | 用 DIP |
+|------|---------|--------|
+| 切换 API 实现 | 改Controller 代码 | 只改 Provider |
+| 单元测试 | 难以 Mock | 轻松替换 TestRepo |
+| 接真实 SDK | 改所有调用方 | 只改 Provider 注入 |
+| 代码可读性 | 能看到所有依赖细节 | 只看抽象，细节隐藏 |
+
+#### 一句话总结
+
+> **依赖倒置就是：我只要"能登录"，不管你用什么方式登录（密码、指纹、人脸）；我只要"能获取数据"，不管你从哪获取（网络、缓存、Mock）。**
 
 ## 运行
 
@@ -81,15 +266,71 @@ App 启动后可以在全局悬浮“开发工具”里切换 `sit/sit2/sit3/uat
 
 语言选择会写入本地存储，下次启动继续生效。新增页面文案时，不建议在页面里直接写死字符串；推荐按下面流程扩展：
 
-1. 在 `lib/app/l10n/app_zh.arb` 增加中文 key。
-2. 在 `lib/app/l10n/app_en.arb` 增加同名英文 key。
-3. 执行 Flutter 本地化生成：
+### 新增国际化文案
+
+**步骤 1：添加文案到 ARB 文件**
+
+中文 `lib/app/l10n/app_zh.arb`：
+```json
+{
+  "loginTitle": "Flutter 企业模板"
+}
+```
+
+英文 `lib/app/l10n/app_en.arb`：
+```json
+{
+  "loginTitle": "Flutter Enterprise Starter"
+}
+```
+
+**步骤 2：运行生成命令**
 
 ```bash
 flutter gen-l10n
 ```
 
-4. 页面通过 `context.l10n.xxx` 读取文案。业务规则层不要直接依赖某一种语言，复杂表单可以像 `CustomerUpdatePolicy` 一样返回错误码，再由 presentation 层翻译成当前语言文案。
+这会自动生成 Dart 代码到 `lib/app/l10n/generated/` 目录。
+
+**步骤 3：在代码中使用**
+
+```dart
+// 获取 l10n 实例
+final l10n = context.l10n;
+
+// 使用文案
+Text(l10n.loginTitle)
+```
+
+### 带参数的文案
+
+如果文案需要动态参数：
+
+```json
+// app_zh.arb
+"greeting": "你好，{name}！",
+"@greeting": {
+  "placeholders": {
+    "name": {}
+  }
+}
+```
+
+```dart
+// 使用
+Text(l10n.greeting('张三'))  // 输出：你好，张三！
+```
+
+### 国际化文件说明
+
+| 文件/目录 | 说明 | 是否可手动编辑 |
+|----------|------|--------------|
+| `l10n.yaml` | 国际化配置文件 | ✅ 可编辑 |
+| `app_zh.arb` | 中文文案（JSON 格式） | ✅ 可编辑 |
+| `app_en.arb` | 英文文案（JSON 格式） | ✅ 可编辑 |
+| `generated/` | 自动生成的 Dart 代码 | ❌ 不要编辑 |
+
+业务规则层不要直接依赖某一种语言，复杂表单可以像 `CustomerUpdatePolicy` 一样返回错误码，再由 presentation 层翻译成当前语言文案。
 
 测试/开发包中会出现全局悬浮“开发工具”按钮。测试人员可以在这里查看：
 
@@ -174,9 +415,31 @@ features/order_apply/
 
 路由约定：
 
-- 底部 `ShellRoute` 只承载一级 Tab，例如 `/home/demos` 和 `/home/settings`。
-- 具体功能 demo 不放在 `ShellRoute` 下，而是从 Demo Hub 使用 `context.push(...)` 打开，例如 `/home/customers` 和 `/home/demos/business-log`。
+- 底部 `StatefulShellRoute.indexedStack` 只承载一级 Tab，例如 `/home/announcements`、`/home/demos` 和 `/home/me`。
+- 具体功能 demo 不放在 `StatefulShellRoute` 下，而是从 Demo Hub 使用 `context.push(...)` 打开，例如 `/home/customers` 和 `/home/demos/business-log`。
 - 这样 demo 页面会显示返回按钮，Android 返回键或侧滑返回会回到 Demo Hub，而不是直接退出 App。
+- `path` 是 URL/深链地址，`name` 是代码里的稳定路由身份；不要用 path 去匹配 `Route.settings.name`。
+- 路由名统一使用 `feature.page` / `feature.action` 风格，并定义在对应 `XxxRoutes` 类中，例如 `CustomerRoutes.customersName = 'customer.list'`。
+- 控制台看到 route name 后，优先全局搜索该字符串或对应 `xxxName` 常量，即可定位到 `features/<feature>/routing/*_routes.dart`，再从 `builder` 跳到页面文件。
+
+当前主要路由名：
+
+| Route name | Path | 路由定义 | 页面 |
+| --- | --- | --- | --- |
+| `auth.login` | `/login` | `AuthRoutes.loginName` | `features/auth/login/presentation/login_page.dart` |
+| `announcement.list` | `/home/announcements` | `AnnouncementRoutes.announcementsName` | `features/announcement/presentation/announcement_page.dart` |
+| `announcement.detail` | `/announcement/detail` | `AnnouncementRoutes.detailName` | `features/announcement/presentation/announcement_detail_page.dart` |
+| `demo.hub` | `/home/demos` | `DemoRoutes.demosName` | `features/demo/presentation/demo_hub_page.dart` |
+| `demo.businessLog` | `/home/demos/business-log` | `DemoRoutes.businessLogDemoName` | `features/demo/presentation/business_log_demo_page.dart` |
+| `settings.me` | `/home/me` | `SettingsRoutes.meName` | `features/settings/presentation/me_page.dart` |
+| `settings.index` | `/setting` | `SettingsRoutes.settingsPageName` | `features/settings/presentation/settings_page.dart` |
+| `settings.language` | `/setting/language` | `SettingsRoutes.settingLanguageName` | `features/settings/presentation/setting_language_page.dart` |
+| `settings.font` | `/setting/font` | `SettingsRoutes.settingFontSizeName` | `features/settings/presentation/setting_font_page.dart` |
+| `customer.list` | `/home/customers` | `CustomerRoutes.customersName` | `features/customer/list/presentation/customer_list_page.dart` |
+| `customer.detail` | `/customer/:id` | `CustomerRoutes.customerDetailName` | `features/customer/detail/presentation/customer_detail_page.dart` |
+| `customer.update` | `/customer/:id/update` | `CustomerRoutes.customerUpdateName` | `features/customer/update/presentation/customer_update_page.dart` |
+| `customer.identityUpdate` | `/customer/:id/identity-update` | `CustomerRoutes.identityUpdateName` | `features/customer/identity/presentation/identity_update_page.dart` |
+| `result.default` | `/result` | `ResultRoutes.resultName` | `features/result/presentation/result_page.dart` |
 
 ## 新增接口
 

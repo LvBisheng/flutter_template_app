@@ -36,10 +36,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonConfirm => 'Confirm';
 
   @override
+  String get exitConfirmTitle => 'Exit App';
+
+  @override
+  String get exitConfirmMessage => 'Are you sure you want to exit?';
+
+  @override
   String get navCustomers => 'Customers';
 
   @override
+  String get navAnnouncements => 'Home';
+
+  @override
   String get navDemos => 'Demos';
+
+  @override
+  String get navMe => 'Me';
 
   @override
   String get navSettings => 'Settings';
@@ -82,6 +94,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginUsername => 'Username';
 
   @override
+  String get loginTitle => 'Flutter Enterprise Starter';
+
+  @override
   String get loginPassword => 'Password';
 
   @override
@@ -89,6 +104,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginEmptyCredentials => 'Please enter username and password';
+
+  @override
+  String get loginInvalidUsername =>
+      'Username can only contain letters, numbers, or underscores';
+
+  @override
+  String get loginUsernameTooShort => 'Username must be at least 4 characters';
+
+  @override
+  String get loginPasswordTooShort => 'Password must be at least 6 characters';
 
   @override
   String get customerListTitle => 'Customer Profiles';
@@ -304,23 +329,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'Settings';
 
   @override
-  String get settingsAccount => 'Account';
-
-  @override
-  String get settingsLoginStatus => 'Login status';
-
-  @override
-  String settingsLoggedInUser(Object userName) {
-    return 'Signed in: $userName';
-  }
-
-  @override
-  String get settingsNotLoggedIn => 'Not signed in';
-
-  @override
-  String get settingsClearToken => 'Clear Token';
-
-  @override
   String get settingsLogout => 'Sign out';
 
   @override
@@ -330,16 +338,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguage => 'Language';
 
   @override
+  String get settingsLanguageDescription =>
+      'Select the app display language. Changes take effect immediately.';
+
+  @override
   String get settingsLanguageSystem => 'System';
 
   @override
+  String get settingsLanguageSystemDesc => 'Follow system language settings';
+
+  @override
   String get settingsLanguageChinese => 'Simplified Chinese';
+
+  @override
+  String get settingsLanguageTraditionalChinese => 'Traditional Chinese';
 
   @override
   String get settingsLanguageEnglish => 'English';
 
   @override
   String get settingsAppInfo => 'App Info';
+
+  @override
+  String get settingsFontSize => 'Font Size';
+
+  @override
+  String get settingsFontSizeDesc => 'Adjust the font size in the app';
+
+  @override
+  String get settingsFontSizeSmall => 'Small';
+
+  @override
+  String get settingsFontSizeStandard => 'Standard';
+
+  @override
+  String get settingsFontSizeLarge => 'Large';
+
+  @override
+  String get settingsFontSizeExtraLarge => 'Extra Large';
+
+  @override
+  String get settingsFontSizeHuge => 'Huge';
+
+  @override
+  String get settingsFontSizePreview => 'Preview';
+
+  @override
+  String get settingsTheme => 'Dark Mode';
+
+  @override
+  String get settingsThemeDescription =>
+      'Select app theme mode. Changes take effect immediately.';
+
+  @override
+  String get settingsThemeLight => 'Light Mode';
+
+  @override
+  String get settingsThemeLightDesc => 'Use light theme';
+
+  @override
+  String get settingsThemeDark => 'Dark Mode';
+
+  @override
+  String get settingsThemeDarkDesc => 'Use dark theme';
+
+  @override
+  String get settingsThemeSystem => 'Follow System';
+
+  @override
+  String get settingsThemeSystemDesc => 'Auto switch between light and dark';
 
   @override
   String get settingsCurrentEnv => 'Current environment';
@@ -355,6 +422,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsProductionDisabled => 'Disabled in production';
+
+  @override
+  String get meTitle => 'Me';
+
+  @override
+  String get meNotLoggedIn => 'Not signed in';
+
+  @override
+  String get meTapToLogin => 'Tap to sign in';
+
+  @override
+  String get meLoggedInUser => 'Signed in';
 
   @override
   String get devToolTitle => 'Dev Tools';
@@ -485,4 +564,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get runtimeErrorTriggerTestSubtitle =>
       'Use this to verify error capture, popup, and copy behavior';
+
+  @override
+  String get announcementTitle => 'Announcements';
+
+  @override
+  String get announcementEmpty => 'No announcements';
 }

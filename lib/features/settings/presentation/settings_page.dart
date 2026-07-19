@@ -1,88 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../app/env/env_config.dart';
-import '../../../app/l10n/app_locale_controller.dart';
 import '../../../capabilities/auth/session_manager.dart';
 import '../../../shared/extensions/context_ext.dart';
 import '../../../shared/ui/feedback/app_dialog.dart';
+import '../../../shared/ui/screen/screen.dart';
+import '../../../shared/ui/widgets/common_app_bar.dart';
+import '../routing/settings_routes.dart';
 
+/// 设置页面（独立页面，无底部导航栏）。
+///
+/// 包含语言设置、字体大小、退出登录。
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(sessionManagerProvider);
-    final env = ref.watch(envConfigProvider);
-    final locale = ref.watch(appLocaleControllerProvider);
     final l10n = context.l10n;
+
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.settingsTitle)),
+      appBar: CommonAppBar(title: l10n.settingsTitle),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: 16.s.paddingAll,
         children: [
-          _SectionTitle(l10n.settingsAccount),
-          _Tile(
-            l10n.settingsLoginStatus,
-            auth.isLoggedIn
-                ? l10n.settingsLoggedInUser(auth.userName ?? '-')
-                : l10n.settingsNotLoggedIn,
+          // 语言设置
+          _MenuTile(
+            icon: Icons.language,
+            title: l10n.settingsLanguage,
+            onTap: () => context.push(SettingsRoutes.settingLanguagePath),
           ),
-          const SizedBox(height: 12),
-          OutlinedButton.icon(
-            onPressed: () async {
-              await ref.read(sessionManagerProvider.notifier).clearToken();
-            },
-            icon: const Icon(Icons.delete_outline),
-            label: Text(l10n.settingsClearToken),
+          SizedBox(height: 8.s),
+
+          // 深色模式
+          _MenuTile(
+            icon: Icons.dark_mode_outlined,
+            title: l10n.settingsTheme,
+            onTap: () => context.push(SettingsRoutes.settingThemePath),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.s),
+
+          // 字体大小
+          _MenuTile(
+            icon: Icons.text_fields,
+            title: l10n.settingsFontSize,
+            onTap: () => context.push(SettingsRoutes.settingFontSizePath),
+          ),
+          SizedBox(height: 24.s),
+
+          // 退出登录
           FilledButton.icon(
             onPressed: () async {
               final ok = await AppDialog.confirm(
                 context,
                 l10n.settingsLogoutConfirm,
               );
-              if (ok) await ref.read(sessionManagerProvider.notifier).logout();
+              if (ok && context.mounted) {
+                await ref.read(sessionManagerProvider.notifier).logout();
+              }
             },
             icon: const Icon(Icons.logout),
             label: Text(l10n.settingsLogout),
-          ),
-          const SizedBox(height: 24),
-          _SectionTitle(l10n.settingsLanguage),
-          RadioGroup<AppLocaleOption>(
-            groupValue: locale.option,
-            onChanged: (option) {
-              if (option != null) {
-                ref.read(appLocaleControllerProvider.notifier).select(option);
-              }
-            },
-            child: Column(
-              children: [
-                _LanguageTile(
-                  option: AppLocaleOption.system,
-                  title: l10n.settingsLanguageSystem,
-                ),
-                _LanguageTile(
-                  option: AppLocaleOption.zhHans,
-                  title: l10n.settingsLanguageChinese,
-                ),
-                _LanguageTile(
-                  option: AppLocaleOption.en,
-                  title: l10n.settingsLanguageEnglish,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          _SectionTitle(l10n.settingsAppInfo),
-          _Tile(l10n.settingsCurrentEnv, env.env.name),
-          _Tile(l10n.settingsBaseUrl, env.baseUrl),
-          _Tile(
-            l10n.settingsDiagnosticsTool,
-            env.switchEnabled
-                ? l10n.settingsFloatingButton
-                : l10n.settingsProductionDisabled,
           ),
         ],
       ),
@@ -90,39 +68,27 @@ class SettingsPage extends ConsumerWidget {
   }
 }
 
-class _LanguageTile extends StatelessWidget {
-  const _LanguageTile({required this.option, required this.title});
+class _MenuTile extends StatelessWidget {
+  const _MenuTile({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
 
-  final AppLocaleOption option;
+  final IconData icon;
   final String title;
+  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => RadioListTile<AppLocaleOption>(
-    contentPadding: EdgeInsets.zero,
-    title: Text(title),
-    value: option,
-  );
-}
-
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 8),
-    child: Text(text, style: Theme.of(context).textTheme.titleMedium),
-  );
-}
-
-class _Tile extends StatelessWidget {
-  const _Tile(this.title, this.value);
-  final String title;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => Card(
-    child: ListTile(title: Text(title), subtitle: Text(value)),
-  );
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
+      ),
+    );
+  }
 }
